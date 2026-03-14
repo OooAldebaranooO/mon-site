@@ -1,0 +1,32 @@
+<h1>Produits Pimcore</h1>
+
+<div *ngIf="loading">Chargement des produits...</div>
+
+<div *ngIf="error && !loading" class="error">
+  {{ error }}
+</div>
+
+<div *ngIf="!loading && !error && products.length === 0">
+  Aucun produit trouvé.
+</div>
+
+<div *ngIf="!loading && !error && products.length > 0" class="list-products">
+  <article class="product-card" *ngFor="let product of products">
+    <div class="brand" *ngIf="product.marque?.logo">
+      <img
+        [src]="'https://pim-trigano.nordsoft.fr/' + product.marque?.logo"
+        [alt]="product.marque?.label || ''"
+      >
+    </div>
+
+    <h3>{{ product.designation || 'Sans désignation' }}</h3>
+    <p><strong>Code :</strong> {{ product.code || '-' }}</p>
+    <p><strong>Statut :</strong> {{ product.statut || '-' }}</p>
+    <p><strong>Marque :</strong> {{ product.marque?.label || '-' }}</p>
+
+    <p *ngIf="product.erpSegmentation">
+      <strong>Segmentation ERP :</strong>
+      {{ product.erpSegmentation.nom || '-' }} ({{ product.erpSegmentation.code || '-' }})
+    </p>
+  </article>
+</div>
