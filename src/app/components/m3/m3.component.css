@@ -1,0 +1,10 @@
+button {
+  padding: 10px 16px;
+  cursor: pointer;
+}
+
+pre {
+  background: #f4f4f4;
+  padding: 12px;
+  margin-top: 16px;
+}

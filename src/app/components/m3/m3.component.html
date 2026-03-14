@@ -1,0 +1,7 @@
+<h2>Connexion ERP M3</h2>
+
+<button (click)="testConnection()">Tester la connexion</button>
+
+<p *ngIf="error">{{ error }}</p>
+
+<pre *ngIf="result">{{ result | json }}</pre>

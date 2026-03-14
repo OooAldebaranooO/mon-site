@@ -1,13 +1,13 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PimService, PimProduct } from '../services/pim.service';
+import { PimService, PimProduct } from '../../services/pim.service';
 
 @Component({
-  selector: 'app-product-list',
+  selector: 'app-pimcore',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './product-list.component.html',
-  styleUrls: ['./product-list.component.css']
+  templateUrl: './pimcore.component.html',
+  styleUrls: ['./pimcore.component.css']
 })
 export class ProductListComponent implements OnInit {
   private pimService = inject(PimService);
