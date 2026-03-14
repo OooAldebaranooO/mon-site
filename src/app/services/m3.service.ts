@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class M3Service {
-  private apiUrl = 'http://localhost:3000/api/m3';
+  private apiUrl = 'https://mon-site-api-m3.azurewebsites.net/api/m3/';
 
   constructor(private http: HttpClient) {}
 
