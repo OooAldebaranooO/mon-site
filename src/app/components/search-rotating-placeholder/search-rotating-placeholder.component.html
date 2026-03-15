@@ -15,7 +15,7 @@
 
     @if (!search) {
       <span class="fake-placeholder">
-        {{ visibleText() }}<span class="cursor">|</span>
+        {{ fixedPrefix }}{{ animatedText() }}<span class="cursor">|</span>
       </span>
     }
   </div>

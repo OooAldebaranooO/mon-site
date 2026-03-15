@@ -12,34 +12,37 @@ import { FormsModule } from '@angular/forms';
 export class SearchRotatingPlaceholderComponent implements OnInit, OnDestroy {
   search = '';
 
+  fixedPrefix = 'Je cherche ';
+
   suggestions = [
-    'Je cherche un produit',
-    'Je cherche une référence',
-    'Je cherche des gants',
-    'Je cherche un distributeur',
-    'Je cherche un savon mains',
-    'Je cherche un essuie-mains'
+    'un produit',
+    'une référence',
+    'des gants',
+    'un distributeur',
+    'un savon mains',
+    'un essuie-mains'
   ];
 
-  visibleText = signal('');
+  animatedText = signal('');
   isPaused = signal(false);
 
   private currentIndex = 0;
-  private rotationInterval: ReturnType<typeof setInterval> | null = null;
   private typingTimeout: ReturnType<typeof setTimeout> | null = null;
-  private isTyping = false;
+  private isRunning = false;
 
-  private rotationDelay = 2000;
-  private typingSpeed = 10;
+  private typingSpeed = 45;
+  private deletingSpeed = 25;
+  private pauseAfterTyping = 1200;
+  private pauseBeforeRestart = 250;
 
   ngOnInit(): void {
-    this.typeText(this.suggestions[this.currentIndex]);
-    this.startRotation();
+    this.startLoop();
   }
 
   ngOnDestroy(): void {
-    if (this.rotationInterval) clearInterval(this.rotationInterval);
-    if (this.typingTimeout) clearTimeout(this.typingTimeout);
+    if (this.typingTimeout) {
+      clearTimeout(this.typingTimeout);
+    }
   }
 
   onFocus(): void {
@@ -49,40 +52,98 @@ export class SearchRotatingPlaceholderComponent implements OnInit, OnDestroy {
   onBlur(): void {
     if (!this.search.trim()) {
       this.isPaused.set(false);
+      if (!this.isRunning) {
+        this.startLoop();
+      }
     }
   }
 
   onInput(): void {
     this.isPaused.set(!!this.search.trim());
+
+    if (!this.search.trim() && !this.isRunning) {
+      this.startLoop();
+    }
   }
 
-  private startRotation(): void {
-    this.rotationInterval = setInterval(() => {
-      if (this.isPaused() || this.search.trim() || this.isTyping) {
+  private startLoop(): void {
+    if (this.isRunning) return;
+
+    this.isRunning = true;
+    this.runAnimation();
+  }
+
+  private runAnimation(): void {
+    if (this.isPaused() || this.search.trim()) {
+      this.isRunning = false;
+      return;
+    }
+
+    const currentWord = this.suggestions[this.currentIndex];
+
+    this.typeWord(currentWord, () => {
+      this.wait(this.pauseAfterTyping, () => {
+        this.deleteWord(currentWord, () => {
+          this.currentIndex = (this.currentIndex + 1) % this.suggestions.length;
+
+          this.wait(this.pauseBeforeRestart, () => {
+            this.runAnimation();
+          });
+        });
+      });
+    });
+  }
+
+  private typeWord(word: string, done: () => void): void {
+    let i = 0;
+
+    const step = () => {
+      if (this.isPaused() || this.search.trim()) {
+        this.isRunning = false;
         return;
       }
 
-      this.currentIndex = (this.currentIndex + 1) % this.suggestions.length;
-      this.typeText(this.suggestions[this.currentIndex]);
-    }, this.rotationDelay);
-  }
-
-  private typeText(text: string): void {
-    this.isTyping = true;
-    this.visibleText.set('');
-
-    let i = 0;
-
-    const typeNext = () => {
-      if (i <= text.length) {
-        this.visibleText.set(text.slice(0, i));
+      if (i <= word.length) {
+        this.animatedText.set(word.slice(0, i));
         i++;
-        this.typingTimeout = setTimeout(typeNext, this.typingSpeed);
+        this.typingTimeout = setTimeout(step, this.typingSpeed);
       } else {
-        this.isTyping = false;
+        done();
       }
     };
 
-    typeNext();
+    step();
+  }
+
+  private deleteWord(word: string, done: () => void): void {
+    let i = word.length;
+
+    const step = () => {
+      if (this.isPaused() || this.search.trim()) {
+        this.isRunning = false;
+        return;
+      }
+
+      if (i >= 0) {
+        this.animatedText.set(word.slice(0, i));
+        i--;
+        this.typingTimeout = setTimeout(step, this.deletingSpeed);
+      } else {
+        done();
+      }
+    };
+
+    step();
+  }
+
+  private wait(duration: number, done: () => void): void {
+    this.typingTimeout = setTimeout(() => {
+      if (this.isPaused() || this.search.trim()) {
+        this.isRunning = false;
+        return;
+      }
+
+      done();
+    }, duration);
   }
 }
