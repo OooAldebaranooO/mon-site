@@ -1,0 +1,10 @@
+<div class="document-card">
+  <h3>{{ document.title }}</h3>
+  <p>{{ document.description }}</p>
+  <small>Ajouté le {{ document.date }}</small>
+
+  <div class="actions">
+    <button (click)="onView()">Voir</button>
+    <button (click)="onDownload()">Télécharger</button>
+  </div>
+</div>

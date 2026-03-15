@@ -1,0 +1,12 @@
+<div class="documents-page">
+  <h1>Mes documents</h1>
+
+  <div class="documents-grid">
+    <app-document-card
+      *ngFor="let doc of documents"
+      [document]="doc"
+      (view)="onViewDocument($event)"
+      (download)="onDownloadDocument($event)">
+    </app-document-card>
+  </div>
+</div>

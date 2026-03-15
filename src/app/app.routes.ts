@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { ProductListComponent } from './components/pimcore/pimcore.component';
 import { M3Component } from './components/m3/m3.component';
+import { DocumentsPageComponent } from './pages/documents-page/documents-page';
 
 export const routes: Routes = [
 
@@ -18,6 +19,9 @@ export const routes: Routes = [
   {
     path: 'm3',
     component: M3Component
+  },
+  {
+    path: 'documents',
+    component: DocumentsPageComponent
   }
-
 ];
