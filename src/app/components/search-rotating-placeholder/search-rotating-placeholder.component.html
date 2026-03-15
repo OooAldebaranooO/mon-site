@@ -1,0 +1,24 @@
+<form class="search-box" (submit)="$event.preventDefault()">
+  <span class="search-icon" aria-hidden="true">🔎</span>
+
+  <div class="input-wrapper">
+    <input
+      type="text"
+      name="search"
+      [(ngModel)]="search"
+      autocomplete="off"
+      aria-label="Recherche"
+      (focus)="onFocus()"
+      (blur)="onBlur()"
+      (input)="onInput()"
+    />
+
+    @if (!search) {
+      <span class="fake-placeholder">
+        {{ visibleText() }}<span class="cursor">|</span>
+      </span>
+    }
+  </div>
+
+  <button type="submit">Rechercher</button>
+</form>
