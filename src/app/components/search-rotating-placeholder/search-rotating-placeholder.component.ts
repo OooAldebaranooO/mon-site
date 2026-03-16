@@ -15,12 +15,10 @@ export class SearchRotatingPlaceholderComponent implements OnInit, OnDestroy {
   fixedPrefix = 'Je cherche ';
 
   suggestions = [
-    'un produit',
-    'une référence',
-    'des gants',
-    'un distributeur',
-    'un savon mains',
-    'un essuie-mains'
+    'une climatisation',
+    'un chauffage',
+    'des panneaux solaires',
+    'une recharge d\'Aquakem',
   ];
 
   animatedText = signal('');

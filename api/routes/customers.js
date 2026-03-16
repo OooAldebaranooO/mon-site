@@ -1,15 +1,28 @@
-require('dotenv').config();
 require('isomorphic-fetch');
 
 const express = require('express');
-const cors = require('cors');
 const { ClientSecretCredential } = require('@azure/identity');
 const { Client } = require('@microsoft/microsoft-graph-client');
 
-const app = express();
+const router = express.Router();
 
-app.use(cors());
-app.use(express.json());
+function validateBody(body) {
+  const errors = [];
+
+  if (!body.displayName || body.displayName.trim().length < 2) {
+    errors.push('displayName invalide');
+  }
+
+  if (!body.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email)) {
+    errors.push('email invalide');
+  }
+
+  if (!body.password || body.password.length < 12) {
+    errors.push('password trop court (12 caractères min)');
+  }
+
+  return errors;
+}
 
 async function getGraphClient() {
   const credential = new ClientSecretCredential(
@@ -28,14 +41,13 @@ async function getGraphClient() {
   });
 }
 
-app.post('/api/customers', async (req, res) => {
+router.post('/', async (req, res) => {
   try {
     const { displayName, email, password } = req.body;
+    const errors = validateBody(req.body);
 
-    if (!displayName || !email || !password) {
-      return res.status(400).json({
-        message: 'displayName, email et password sont requis'
-      });
+    if (errors.length) {
+      return res.status(400).json({ message: errors.join(', ') });
     }
 
     const domain = process.env.AZURE_PRIMARY_DOMAIN;
@@ -45,57 +57,29 @@ app.post('/api/customers', async (req, res) => {
       });
     }
 
-    const normalizedEmail = email.toLowerCase().trim();
-
-    const alias = normalizedEmail
-      .replace('@', '_')
-      .replace(/[^a-zA-Z0-9._-]/g, '_');
-
-    const userPrincipalName = `${alias}@${domain}`;
-
-    const graphClient = await getGraphClient();
-
-    // Vérification doublon plus rapide
-    try {
-      const existingUser = await graphClient
-        .api(`/users/${encodeURIComponent(userPrincipalName)}`)
-        .select('id,displayName,userPrincipalName')
-        .get();
-
-      if (existingUser?.id) {
-        return res.status(409).json({
-          message: 'Un compte existe déjà avec cet email.'
-        });
-      }
-    } catch (error) {
-      const statusCode = error?.statusCode || error?.status;
-
-      // 404 = utilisateur inexistant => on continue
-      if (statusCode !== 404) {
-        throw error;
-      }
-    }
+    const alias = email.split('@')[0].replace(/[^a-zA-Z0-9._-]/g, '') || 'user';
 
     const userPayload = {
       accountEnabled: true,
       displayName,
       mailNickname: alias,
-      userPrincipalName,
+      userPrincipalName: `${alias}@${domain}`,
       passwordProfile: {
         password,
         forceChangePasswordNextSignIn: true
       }
     };
 
+    const graphClient = await getGraphClient();
     const createdUser = await graphClient.api('/users').post(userPayload);
 
     return res.status(201).json({
-      message: 'Utilisateur créé',
+      message: 'Utilisateur créé dans Entra ID',
       data: {
         id: createdUser.id,
         displayName: createdUser.displayName,
         userPrincipalName: createdUser.userPrincipalName,
-        email: normalizedEmail
+        email
       }
     });
   } catch (error) {
@@ -105,7 +89,9 @@ app.post('/api/customers', async (req, res) => {
       message:
         error?.body?.error?.message ||
         error?.message ||
-        'Erreur serveur'
+        'Erreur lors de la création du compte'
     });
   }
 });
+
+module.exports = router;

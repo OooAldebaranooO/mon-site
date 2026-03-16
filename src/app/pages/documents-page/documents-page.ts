@@ -35,6 +35,30 @@ export class DocumentsPageComponent {
       date: '10/03/2026',
       viewUrl: '/assets/docs/guide.pdf',
       downloadUrl: '/assets/docs/guide.pdf'
+    },
+    {
+      id: 4,
+      title: 'Guide client',
+      description: 'Guide d’utilisation pour les clients.',
+      date: '10/03/2026',
+      viewUrl: '/assets/docs/guide.pdf',
+      downloadUrl: '/assets/docs/guide.pdf'
+    },
+    {
+      id: 5,
+      title: 'Guide client',
+      description: 'Guide d’utilisation pour les clients.',
+      date: '10/03/2026',
+      viewUrl: '/assets/docs/guide.pdf',
+      downloadUrl: '/assets/docs/guide.pdf'
+    },
+    {
+      id: 6,
+      title: 'Guide client',
+      description: 'Guide d’utilisation pour les clients.',
+      date: '10/03/2026',
+      viewUrl: '/assets/docs/guide.pdf',
+      downloadUrl: '/assets/docs/guide.pdf'
     }
   ];
 

@@ -1,7 +1,7 @@
-<h2>Connexion ERP M3</h2>
+<h1>Connexion ERP M3</h1>
 
-<button (click)="testConnection()">Tester la connexion</button>
-
-<p *ngIf="error">{{ error }}</p>
-
-<pre *ngIf="result">{{ result | json }}</pre>
+<div class="pave-m3">
+    <button type="button" (click)="testConnection()" class="error">Tester la connexion</button>
+    <p *ngIf="error" class="error">{{ error }}</p>
+    <pre *ngIf="result">{{ result | json }}</pre>
+</div>
