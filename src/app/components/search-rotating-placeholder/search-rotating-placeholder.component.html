@@ -1,4 +1,4 @@
-<form class="search-box" (submit)="$event.preventDefault()">
+<form class="search-box" (ngSubmit)="onSearch()">
   <span class="search-icon" aria-hidden="true">🔎</span>
 
   <div class="input-wrapper">
@@ -6,11 +6,8 @@
       type="text"
       name="search"
       [(ngModel)]="search"
-      autocomplete="off"
-      aria-label="Recherche"
       (focus)="onFocus()"
       (blur)="onBlur()"
-      (input)="onInput()"
     />
 
     @if (!search) {

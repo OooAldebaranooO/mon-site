@@ -1,6 +1,7 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PimService, PimProduct } from '../../services/pim.service';
+import { SearchService } from '../../services/search.service';
 
 @Component({
   selector: 'app-pimcore',
@@ -12,42 +13,46 @@ import { PimService, PimProduct } from '../../services/pim.service';
 export class ProductListComponent implements OnInit {
   private pimService = inject(PimService);
   private cdr = inject(ChangeDetectorRef);
-
-  private static nextId = 1;
-  instanceId = ProductListComponent.nextId++;
+  private searchService = inject(SearchService);
 
   loading = true;
   error = '';
   products: PimProduct[] = [];
 
+  constructor() {
+    effect(() => {
+      const term = this.searchService.searchTerm();
+      this.loadProducts(term);
+    });
+  }
+
   ngOnInit(): void {
-    console.log('INSTANCE ID =', this.instanceId);
+    console.log('Pimcore component initialisé');
+  }
 
-    this.pimService.getProducts(30).subscribe({
-    next: (res) => {
-      console.log('INSTANCE', this.instanceId, 'Réponse API :', res);
+  private loadProducts(term: string): void {
+    this.loading = true;
+    this.error = '';
 
-      this.products = (res.products ?? []).filter(p => !!p.code?.trim());
+    const search = term.trim();
+    const first = search ? 20 : 30;
 
-      this.error = '';
-      this.loading = false;
-      this.cdr.detectChanges();
+    console.log('Chargement produits avec :', { first, search });
 
-      console.log(
-        'INSTANCE',
-        this.instanceId,
-        'loading =',
-        this.loading,
-        'products.length =',
-        this.products.length
-      );
-    },
-    error: (err) => {
-      console.error('INSTANCE', this.instanceId, 'Erreur API :', err);
-      this.error = 'Erreur lors du chargement des produits Pimcore';
-      this.loading = false;
-      this.cdr.detectChanges();
-    }
-  });
+    this.pimService.getProducts(first, search).subscribe({
+      next: (res) => {
+        console.log('Réponse API :', res);
+        this.products = (res.products ?? []).filter(p => !!p.code?.trim());
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Erreur API complète :', err);
+        this.products = [];
+        this.error = err?.error?.error || err?.message || 'Erreur lors du chargement des produits Pimcore';
+        this.loading = false;
+        this.cdr.detectChanges();
+      }
+    });
   }
 }

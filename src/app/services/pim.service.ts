@@ -29,12 +29,10 @@ export interface PimProductsResponse {
   providedIn: 'root'
 })
 export class PimService {
-
   private http = inject(HttpClient);
   private apiUrl = 'http://localhost:8000/api/pim_products.php';
 
   getProducts(first: number = 30, filter: string = ''): Observable<PimProductsResponse> {
-
     let params = new HttpParams().set('first', first);
 
     if (filter.trim() !== '') {
@@ -43,8 +41,6 @@ export class PimService {
 
     return this.http
       .get<PimProductsResponse>(this.apiUrl, { params })
-      .pipe(
-        timeout(10000)
-      );
+      .pipe(timeout(60000));
   }
 }

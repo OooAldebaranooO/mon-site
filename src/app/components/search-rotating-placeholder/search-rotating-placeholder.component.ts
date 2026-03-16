@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { SearchService } from '../../services/search.service';
 
 @Component({
   selector: 'app-search-rotating-placeholder',
@@ -10,8 +11,9 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./search-rotating-placeholder.component.css']
 })
 export class SearchRotatingPlaceholderComponent implements OnInit, OnDestroy {
-  search = '';
+  private searchService = inject(SearchService);
 
+  search = '';
   fixedPrefix = 'Je cherche ';
 
   suggestions = [
@@ -56,11 +58,17 @@ export class SearchRotatingPlaceholderComponent implements OnInit, OnDestroy {
     }
   }
 
-  onInput(): void {
-    this.isPaused.set(!!this.search.trim());
+  onSearch(): void {
+    const value = this.search.trim();
 
-    if (!this.search.trim() && !this.isRunning) {
-      this.startLoop();
+    this.isPaused.set(!!value);
+    this.searchService.setSearchTerm(value);
+
+    if (!value) {
+      this.isPaused.set(false);
+      if (!this.isRunning) {
+        this.startLoop();
+      }
     }
   }
 
