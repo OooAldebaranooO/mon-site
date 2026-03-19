@@ -13,12 +13,6 @@ export const routes: Routes = [
   },
 
   {
-    path: '',
-    redirectTo: 'pimcore',
-    pathMatch: 'full'
-  },
-
-  {
     path: 'pimcore',
     component: ProductListComponent
   },

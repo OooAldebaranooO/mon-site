@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface RegisterPayload {
   displayName: string;
@@ -18,14 +19,12 @@ export interface RegisterResponse {
   };
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class CustomerService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:3000/api/customers';
+  private baseUrl = environment.apis.azure;
 
   register(payload: RegisterPayload): Observable<RegisterResponse> {
-    return this.http.post<RegisterResponse>(this.apiUrl, payload);
-  }
+  return this.http.post<RegisterResponse>(this.baseUrl, payload);
+}
 }

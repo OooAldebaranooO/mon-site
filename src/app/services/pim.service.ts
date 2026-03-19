@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { timeout } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 export interface PimProduct {
   code: string | null;
@@ -25,13 +26,11 @@ export interface PimProductsResponse {
   products: PimProduct[];
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class PimService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8000/api/pim_products.php';
-
+  private apiUrl = environment.apis.pim;
+  
   getProducts(first: number = 30, filter: string = ''): Observable<PimProductsResponse> {
     let params = new HttpParams().set('first', first);
 

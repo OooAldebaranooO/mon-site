@@ -55,7 +55,6 @@ app.post('/api/customers', async (req, res) => {
 
     const graphClient = await getGraphClient();
 
-    // Vérification doublon plus rapide
     try {
       const existingUser = await graphClient
         .api(`/users/${encodeURIComponent(userPrincipalName)}`)
@@ -70,7 +69,6 @@ app.post('/api/customers', async (req, res) => {
     } catch (error) {
       const statusCode = error?.statusCode || error?.status;
 
-      // 404 = utilisateur inexistant => on continue
       if (statusCode !== 404) {
         throw error;
       }
@@ -108,4 +106,10 @@ app.post('/api/customers', async (req, res) => {
         'Erreur serveur'
     });
   }
+});
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`API Azure démarrée sur http://localhost:${PORT}`);
 });

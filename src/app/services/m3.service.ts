@@ -1,16 +1,14 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class M3Service {
-  private apiUrl = 'https://mon-site-api-m3-e4dxbxczeqhef0hm.francecentral-01.azurewebsites.net';
+  private http = inject(HttpClient);
+  private baseUrl = environment.apis.m3;
 
-  constructor(private http: HttpClient) {}
-
-  testConnection(): Observable<any> {
-  return this.http.get(`${this.apiUrl}/`);
-}
+  testConnection(): Observable<unknown> {
+    return this.http.get(`${this.baseUrl}/`);
+  }
 }
